@@ -1,0 +1,128 @@
+/* ================= HEADER ================= */
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 80px;
+  z-index: 1000;
+  backdrop-filter: blur(20px);
+  background: rgba(5, 8, 22, 0.6);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  transition: 0.3s ease;
+}
+
+.header.shrink {
+  height: 60px;
+  background: rgba(5, 8, 22, 0.9);
+}
+
+/* ================= NAVBAR ================= */
+.navbar {
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* ================= LOGO ================= */
+.logo {
+  font-weight: 700;
+  font-size: 1.3rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* ================= NAV ================= */
+.nav {
+  position: relative;
+  display: flex;
+  gap: 2rem;
+  align-items: center;
+}
+
+/* ================= NAV ITEMS ================= */
+.nav-item {
+  background: none;
+  border: none;
+  color: #aab3c5;
+  cursor: pointer;
+  font-size: 1rem;
+  padding: 0.5rem 0;
+  transition: color 0.3s ease;
+}
+
+.nav-item:hover {
+  color: white;
+}
+
+.nav-item.active {
+  color: white;
+}
+
+/* ================= VERCEL UNDERLINE (MOVING BAR) ================= */
+.nav-underline {
+  position: absolute;
+  bottom: 0;
+  height: 2px;
+  background: linear-gradient(135deg, #7c3aed, #06b6d4);
+  border-radius: 2px;
+  transition: all 0.35s ease;
+  pointer-events: none;
+}
+
+/* ================= CTA BUTTON ================= */
+.nav-btn {
+  background: linear-gradient(135deg, #7c3aed, #06b6d4);
+  color: white;
+  padding: 0.7rem 1.2rem;
+  border-radius: 12px;
+  font-weight: 600;
+  box-shadow: 0 10px 30px rgba(124,58,237,0.3);
+  transition: 0.3s;
+  border: none;
+  cursor: pointer;
+}
+
+.nav-btn:hover {
+  transform: translateY(-3px);
+}
+
+/* ================= MOBILE MENU BUTTON ================= */
+.menu-btn {
+  display: none;
+  background: transparent;
+  border: none;
+  color: white;
+}
+
+/* ================= MOBILE MENU ================= */
+.nav.active {
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  top: 80px;
+  right: 20px;
+  background: rgba(5, 8, 22, 0.95);
+  padding: 1rem;
+  border-radius: 12px;
+  gap: 1rem;
+  border: 1px solid rgba(255,255,255,0.1);
+  z-index: 9999;
+}
+
+/* ================= RESPONSIVE ================= */
+@media (max-width: 900px) {
+  .nav {
+    display: none;
+  }
+
+  .nav.active {
+    display: flex;
+  }
+
+  .menu-btn {
+    display: block;
+  }
+}

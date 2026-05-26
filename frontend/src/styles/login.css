@@ -1,0 +1,248 @@
+
+/* ================= LOGIN WRAPPER ================= */
+.login-wrapper {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  padding: 20px;
+
+  background: radial-gradient(circle at top, #0b1024, #050816);
+}
+
+/* ================= LOGIN CARD ================= */
+.login-card {
+  width: 100%;
+  max-width: 420px;
+
+  padding: 2rem;
+
+  border-radius: 24px;
+
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+
+  backdrop-filter: blur(20px);
+
+  color: white;
+  text-align: center;
+
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
+}
+
+/* ================= HEADER ================= */
+.login-top h1 {
+  font-size: 2rem;
+  margin-bottom: 8px;
+}
+
+.login-top p {
+  color: #9ca3af;
+  margin-bottom: 2rem;
+}
+
+/* ================= FORM ================= */
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* ================= INPUT GROUP ================= */
+.input-group {
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.input-group label {
+  font-size: 0.9rem;
+  color: #d1d5db;
+}
+
+/* ================= INPUTS ================= */
+.input-group input {
+  width: 100%;
+  padding: 14px;
+
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+
+  background: rgba(255, 255, 255, 0.05);
+  color: white;
+
+  font-size: 1rem;
+
+  outline: none;
+  transition: 0.2s ease;
+}
+
+.input-group input:focus {
+  border-color: #7c3aed;
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.2);
+}
+
+/* ================= PASSWORD BOX (FIXED ONLY ONCE) ================= */
+/* ================= PASSWORD WRAPPER ================= */
+.password-box {
+  position: relative;
+  width: 100%;
+}
+
+/* INPUT */
+.password-box input {
+  width: 100%;
+  padding: 14px 90px 14px 14px; 
+  /* 👆 right padding creates space for button */
+
+  border-radius: 14px;
+
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.05);
+
+  color: white;
+  font-size: 1rem;
+
+  outline: none;
+}
+
+/* ================= SHOW / HIDE BUTTON ================= */
+.toggle-btn {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+
+  border: none;
+  background: transparent;
+
+  color: #cbd5e1;
+  font-size: 0.8rem;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  padding: 4px 8px;
+  border-radius: 6px;
+
+  transition: 0.2s ease;
+}
+
+/* hover */
+.toggle-btn:hover {
+  color: white;
+  background: rgba(124, 58, 237, 0.2);
+}
+
+/* click effect */
+.toggle-btn:active {
+  transform: translateY(-50%) scale(0.95);
+}
+
+/* ================= LOGIN BUTTON ================= */
+.login-form button[type="submit"] {
+  width: 100%;
+  padding: 14px;
+
+  border: none;
+  border-radius: 14px;
+
+  background: linear-gradient(135deg, #7c3aed, #06b6d4);
+
+  color: white;
+  font-weight: 700;
+  font-size: 1rem;
+
+  cursor: pointer;
+  transition: 0.25s ease;
+}
+
+.login-form button[type="submit"]:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px rgba(124, 58, 237, 0.35);
+}
+
+.login-form button[type="submit"]:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* ================= ERROR ================= */
+.error-box {
+  padding: 12px;
+
+  border-radius: 12px;
+
+  background: rgba(255, 0, 0, 0.08);
+  border: 1px solid rgba(255, 0, 0, 0.2);
+
+  color: #ff6b6b;
+  font-size: 0.9rem;
+
+  text-align: left;
+}
+
+/* ================= DIVIDER ================= */
+.divider {
+  margin: 1rem 0;
+  font-size: 0.85rem;
+  color: #9ca3af;
+
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.divider::before,
+.divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* ================= SOCIAL LOGIN ================= */
+.social-login {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.social-login button {
+  width: 100%;
+  padding: 12px;
+
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+
+  background: rgba(255, 255, 255, 0.05);
+
+  color: white;
+  font-size: 0.95rem;
+
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.social-login button:hover {
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateY(-1px);
+}
+
+/* Google highlight */
+.social-login button:first-child {
+  border-color: rgba(66, 133, 244, 0.4);
+}
+
+/* ================= MOBILE ================= */
+@media (max-width: 480px) {
+  .login-card {
+    padding: 1.5rem;
+  }
+
+  .login-top h1 {
+    font-size: 1.7rem;
+  }
+}
