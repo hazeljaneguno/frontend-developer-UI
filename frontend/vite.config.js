@@ -3,11 +3,12 @@ import react from "@vitejs/plugin-react";
 import { VitePWA } from "vite-plugin-pwa";
 
 export default defineConfig({
-  base: "./",
+  // IMPORTANT: better for Vercel than "./"
+  base: "/",
 
-  // ADD THIS
   build: {
     chunkSizeWarningLimit: 1000,
+    outDir: "dist",
   },
 
   plugins: [
