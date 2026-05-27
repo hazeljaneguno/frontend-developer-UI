@@ -3,31 +3,21 @@ import react from "@vitejs/plugin-react";
 import { VitePWA } from "vite-plugin-pwa";
 
 export default defineConfig({
-  // IMPORTANT: better for Vercel than "./"
   base: "/",
-
-  build: {
-    chunkSizeWarningLimit: 1000,
-    outDir: "dist",
-  },
 
   plugins: [
     react(),
 
     VitePWA({
       registerType: "autoUpdate",
-
       manifest: {
         name: "HazelUI",
         short_name: "HazelUI",
         description: "Modern React developer portfolio",
-
         theme_color: "#0b1024",
         background_color: "#050816",
-
         display: "standalone",
         start_url: "/",
-
         icons: [
           {
             src: "/icon-192.png",
@@ -41,11 +31,16 @@ export default defineConfig({
           },
         ],
       },
-
       workbox: {
         cleanupOutdatedCaches: true,
         clientsClaim: true,
       },
     }),
   ],
+
+  build: {
+    outDir: "dist",
+    chunkSizeWarningLimit: 1000,
+    sourcemap: false,
+  },
 });
