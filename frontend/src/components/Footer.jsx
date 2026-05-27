@@ -1,4 +1,4 @@
-export default function Footer({ scrollTo, refs }) {
+export default function Footer() {
   const year = new Date().getFullYear();
 
   return (
@@ -7,32 +7,16 @@ export default function Footer({ scrollTo, refs }) {
 
         {/* BRAND */}
         <div className="footer-brand">
-          <h3>HazelUI</h3>
+          <h2>HazelUI</h2>
+
           <p>
-            Modern React UI kit built for fast,
-            scalable, and beautiful web apps.
+            Building modern, scalable, and interactive
+            React applications with clean UI/UX.
           </p>
-        </div>
 
-        {/* NAVIGATION */}
-        <div className="footer-column">
-          <h4>Navigation</h4>
-
-          <button className="footer-link" onClick={() => scrollTo(refs.heroRef)}>
-            Home
-          </button>
-
-          <button className="footer-link" onClick={() => scrollTo(refs.featuresRef)}>
-            Features
-          </button>
-
-          <button className="footer-link" onClick={() => scrollTo(refs.pricingRef)}>
-            Pricing
-          </button>
-
-          <button className="footer-link" onClick={() => scrollTo(refs.contactRef)}>
-            Contact
-          </button>
+          <span className="footer-tag">
+            Frontend Developer • React Enthusiast
+          </span>
         </div>
 
         {/* CONNECT */}
@@ -48,36 +32,40 @@ export default function Footer({ scrollTo, refs }) {
           </a>
 
           <a
-            href="https://linkedin.com"
+            href="https://linkedin.com/in/your-link"
             target="_blank"
             rel="noopener noreferrer"
           >
             LinkedIn
           </a>
 
-          <a href="#">
-            Portfolio
+          <a
+            href="mailto:hazel@example.com"
+          >
+            Email
           </a>
         </div>
 
-        {/* RESUME (NEW CLEAN SECTION) */}
+        {/* RESOURCES */}
         <div className="footer-column">
-          <h4>Resume</h4>
+          <h4>Resources</h4>
 
           <a
             href="/Resume.pdf"
             download
-            className="footer-link"
           >
-            📄 Download PDF
+            📄 Resume PDF
           </a>
 
           <a
             href="/Resume.png"
             download
-            className="footer-link"
           >
-            🖼 Download PNG
+            🖼 Resume Preview
+          </a>
+
+          <a href="#">
+            Case Studies
           </a>
         </div>
 
@@ -85,21 +73,35 @@ export default function Footer({ scrollTo, refs }) {
         <div className="footer-column">
           <h4>Stay Updated</h4>
 
-          <p>Get updates about new projects and features.</p>
+          <p>
+            Get notified about new projects,
+            UI experiments, and updates.
+          </p>
 
           <form
             className="footer-input"
             onSubmit={(e) => e.preventDefault()}
           >
-            <input type="email" placeholder="Enter your email" />
-            <button type="submit">Subscribe</button>
+            <input
+              type="email"
+              placeholder="Enter your email"
+            />
+
+            <button type="submit">
+              Subscribe
+            </button>
           </form>
         </div>
 
       </div>
 
+      {/* BOTTOM */}
       <div className="footer-bottom">
-        <p>© {year} HazelUI. All rights reserved.</p>
+
+        <p>
+          © {year} HazelUI — Designed & Built with React.
+        </p>
+
       </div>
     </footer>
   );

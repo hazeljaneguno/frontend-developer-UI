@@ -31,7 +31,6 @@ import Contact from "./sections/Contact";
 export default function App() {
   const location = useLocation();
 
-  /* ================= REFS ================= */
   const heroRef = useRef(null);
   const featuresRef = useRef(null);
   const collaborationRef = useRef(null);
@@ -46,12 +45,10 @@ export default function App() {
     contactRef,
   };
 
-  /* ================= STATES ================= */
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [activeSection, setActiveSection] = useState("hero");
 
-  /* ================= PAGE VIEW (SAFE) ================= */
   useEffect(() => {
     const timeout = setTimeout(() => {
       trackEvent("page_view", {
@@ -61,8 +58,6 @@ export default function App() {
 
     return () => clearTimeout(timeout);
   }, [location.pathname]);
-
-  /* ================= SCROLL TO ================= */
   const scrollTo = (ref) => {
     if (!ref?.current) return;
 
@@ -76,7 +71,6 @@ export default function App() {
     });
   };
 
-  /* ================= SCROLL SPY (OPTIMIZED) ================= */
   useEffect(() => {
     const sections = [
       { ref: heroRef, name: "hero" },
@@ -126,7 +120,6 @@ export default function App() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  /* ================= APP ================= */
   return (
     <Routes>
 

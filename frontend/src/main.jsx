@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import ReactDOM from "react-dom/client";
 import { BrowserRouter, useLocation } from "react-router-dom";
 import App from "./App.jsx";
@@ -9,9 +9,10 @@ import ReactGA from "react-ga4";
 
 const GA_ID = import.meta.env.VITE_GA_ID;
 
-if (GA_ID) {
+if (GA_ID && !window.__GA_INITIALIZED__) {
   ReactGA.initialize(GA_ID);
-} else {
+  window.__GA_INITIALIZED__ = true;
+} else if (!GA_ID) {
   console.warn("❌ Missing VITE_GA_ID in environment variables");
 }
 
@@ -20,13 +21,13 @@ if (GA_ID) {
 function GAListener() {
   const location = useLocation();
 
-  React.useEffect(() => {
-    if (GA_ID) {
-      ReactGA.send({
-        hitType: "pageview",
-        page: location.pathname + location.search,
-      });
-    }
+  useEffect(() => {
+    if (!GA_ID) return;
+
+    ReactGA.send({
+      hitType: "pageview",
+      page: location.pathname + location.search,
+    });
   }, [location]);
 
   return null;
@@ -35,10 +36,8 @@ function GAListener() {
 /* ================= APP ROOT ================= */
 
 ReactDOM.createRoot(document.getElementById("root")).render(
-  <React.StrictMode>
-    <BrowserRouter>
-      <GAListener />
-      <App />
-    </BrowserRouter>
-  </React.StrictMode>
+  <BrowserRouter>
+    <GAListener />
+    <App />
+  </BrowserRouter>
 );

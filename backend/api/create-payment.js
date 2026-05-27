@@ -4,25 +4,23 @@ export default async function handler(req, res) {
   const FRONTEND_URL = process.env.FRONTEND_URL;
   const PAYMONGO_SECRET = process.env.PAYMONGO_SECRET_KEY;
 
-  /* ================= VALIDATION ================= */
-
+  /* ================= ENV CHECK ================= */
   if (!FRONTEND_URL || !PAYMONGO_SECRET) {
     return res.status(500).json({
       success: false,
-      error: "Missing environment variables",
+      error: "Server misconfigured: missing env variables",
     });
   }
 
   /* ================= CORS ================= */
-
   const origin = req.headers.origin;
 
-  const allowedOrigins = [
+  const allowedOrigins = new Set([
     FRONTEND_URL,
     "http://localhost:5173",
-  ];
+  ]);
 
-  if (origin && allowedOrigins.includes(origin)) {
+  if (origin && allowedOrigins.has(origin)) {
     res.setHeader("Access-Control-Allow-Origin", origin);
   }
 
@@ -31,13 +29,11 @@ export default async function handler(req, res) {
   res.setHeader("Vary", "Origin");
 
   /* ================= PRE-FLIGHT ================= */
-
   if (req.method === "OPTIONS") {
-    return res.status(200).end();
+    return res.status(204).end();
   }
 
   /* ================= METHOD CHECK ================= */
-
   if (req.method !== "POST") {
     return res.status(405).json({
       success: false,
@@ -48,8 +44,7 @@ export default async function handler(req, res) {
   try {
     const { plan, price, email } = req.body;
 
-    /* ================= INPUT VALIDATION ================= */
-
+    /* ================= VALIDATION ================= */
     if (!plan || !price || !email) {
       return res.status(400).json({
         success: false,
@@ -62,21 +57,19 @@ export default async function handler(req, res) {
     if (!Number.isFinite(parsedPrice) || parsedPrice <= 0) {
       return res.status(400).json({
         success: false,
-        error: "Invalid price",
+        error: "Invalid price value",
       });
     }
 
     const amount = Math.round(parsedPrice * 100);
 
     /* ================= PAYMONGO REQUEST ================= */
-
     const response = await axios.post(
       "https://api.paymongo.com/v1/checkout_sessions",
       {
         data: {
           attributes: {
             send_email_receipt: true,
-            show_description: true,
             description: `Payment for ${plan}`,
 
             line_items: [
@@ -102,17 +95,20 @@ export default async function handler(req, res) {
             "Basic " +
             Buffer.from(`${PAYMONGO_SECRET}:`).toString("base64"),
           "Content-Type": "application/json",
+          Accept: "application/json",
         },
+        timeout: 15000,
       }
     );
 
+    /* ================= SAFE EXTRACTION ================= */
     const checkoutUrl =
       response.data?.data?.attributes?.checkout_url;
 
     if (!checkoutUrl) {
       return res.status(500).json({
         success: false,
-        error: "No checkout URL returned",
+        error: "Checkout URL not returned by PayMongo",
       });
     }
 
@@ -122,12 +118,16 @@ export default async function handler(req, res) {
     });
 
   } catch (error) {
-    console.error("PAYMONGO ERROR:", error.response?.data || error.message);
+    console.error(
+      "PAYMONGO ERROR:",
+      error.response?.data || error.message
+    );
 
     return res.status(500).json({
       success: false,
       error:
         error.response?.data?.errors?.[0]?.detail ||
+        error.message ||
         "Payment failed",
     });
   }

@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
@@ -12,17 +12,7 @@ export default function Pricing() {
   const [error, setError] = useState("");
   const [serverStatus, setServerStatus] = useState("checking");
 
-  /* ================= BACKEND URL ================= */
-  const BACKEND_URL = useMemo(() => {
-    const url = import.meta.env.VITE_BACKEND_URL;
-
-    if (!url) {
-      console.error("❌ Missing VITE_BACKEND_URL");
-      return "";
-    }
-
-    return url.replace(/\/$/, "");
-  }, []);
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL?.replace(/\/$/, "");
 
   /* ================= HEALTH CHECK ================= */
   useEffect(() => {
@@ -31,9 +21,10 @@ export default function Pricing() {
       return;
     }
 
+    let isMounted = true;
     const controller = new AbortController();
 
-    const timeoutId = setTimeout(() => {
+    const timeout = setTimeout(() => {
       controller.abort();
     }, 15000);
 
@@ -44,39 +35,31 @@ export default function Pricing() {
           signal: controller.signal,
         });
 
-        if (!res.ok) {
-          throw new Error(`HTTP ${res.status}`);
-        }
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
         const data = await res.json();
 
-        console.log("✅ Backend health:", data);
-
-        setServerStatus("connected");
-      } catch (err) {
-        if (err.name === "AbortError") {
-          console.warn("⏱️ Backend timeout / cold start");
-          setServerStatus("checking");
-        } else if (
-          err.message === "Failed to fetch" ||
-          err.message.includes("NetworkError")
-        ) {
-          console.error("🌐 Network / CORS / Backend unreachable");
+        if (isMounted && data?.success) {
+          setServerStatus("connected");
+        } else if (isMounted) {
           setServerStatus("offline");
-        } else {
-          console.error("🔴 Backend error:", err.message);
+        }
+      } catch (err) {
+        if (isMounted) {
+          console.error("Backend check failed:", err.message);
           setServerStatus("offline");
         }
       } finally {
-        clearTimeout(timeoutId);
+        clearTimeout(timeout);
       }
     };
 
     checkBackend();
 
     return () => {
+      isMounted = false;
       controller.abort();
-      clearTimeout(timeoutId);
+      clearTimeout(timeout);
     };
   }, [BACKEND_URL]);
 
@@ -103,7 +86,6 @@ export default function Pricing() {
           action: { plan, price },
         },
       });
-
       return;
     }
 
@@ -112,11 +94,11 @@ export default function Pricing() {
     setLoadingPlan(plan);
 
     try {
-      trackEvent("order_click", {
-        plan,
-        price,
-        user: user.email,
-      });
+      try {
+        trackEvent("order_click", { plan, price, user: user.email });
+      } catch (e) {
+        console.warn("Analytics failed:", e);
+      }
 
       const response = await axios.post(
         `${BACKEND_URL}/api/create-payment`,
@@ -126,9 +108,7 @@ export default function Pricing() {
           email: user.email,
         },
         {
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: { "Content-Type": "application/json" },
           timeout: 20000,
         }
       );
@@ -139,22 +119,30 @@ export default function Pricing() {
         throw new Error("Checkout URL missing");
       }
 
-      trackEvent("order_success", {
-        plan,
-        price,
-        user: user.email,
-      });
+      try {
+        trackEvent("order_success", {
+          plan,
+          price,
+          user: user.email,
+        });
+      } catch (e) {
+        console.warn("Analytics failed:", e);
+      }
 
       window.location.href = checkoutUrl;
     } catch (err) {
-      console.error("❌ Payment error:", err);
+      console.error("Payment error:", err);
 
       if (axios.isAxiosError(err)) {
-        setError(
-          err.response?.data?.error ||
-            err.message ||
-            "Payment failed."
-        );
+        if (err.code === "ECONNABORTED") {
+          setError("Request timed out. Please try again.");
+        } else {
+          setError(
+            err.response?.data?.error ||
+              err.message ||
+              "Payment failed."
+          );
+        }
       } else {
         setError("Something went wrong.");
       }
@@ -168,31 +156,19 @@ export default function Pricing() {
     {
       title: "UI Only",
       price: 500,
-      desc: [
-        "Frontend Design",
-        "Responsive Layout",
-        "Basic Components",
-      ],
+      desc: ["Frontend Design", "Responsive Layout", "Basic Components"],
     },
     {
       title: "UI + Interaction",
       price: 1500,
       highlight: true,
       badge: "MOST POPULAR",
-      desc: [
-        "Animations",
-        "Interactive UI",
-        "Advanced Components",
-      ],
+      desc: ["Animations", "Interactive UI", "Advanced Components"],
     },
     {
       title: "Full Stack",
       price: 3000,
-      desc: [
-        "Frontend + Backend",
-        "Database",
-        "Authentication",
-      ],
+      desc: ["Frontend + Backend", "Database", "Authentication"],
     },
   ];
 
@@ -200,61 +176,37 @@ export default function Pricing() {
     <section className="pricing modern-pricing">
       <div className="container">
 
-        {/* TITLE */}
         <div className="section-title">
           <span>PRICING</span>
-
           <h2>Choose Your Plan</h2>
-
           <p>Secure GCash Payment via PayMongo</p>
         </div>
 
-        {/* SERVER STATUS */}
         <div className="server-status">
-          {serverStatus === "checking" && (
-            <p>🟡 Checking backend...</p>
-          )}
-
-          {serverStatus === "connected" && (
-            <p>🟢 Backend Connected</p>
-          )}
-
-          {serverStatus === "offline" && (
-            <p>🔴 Backend Offline</p>
-          )}
+          {serverStatus === "checking" && <p>🟡 Checking backend...</p>}
+          {serverStatus === "connected" && <p>🟢 Backend Connected</p>}
+          {serverStatus === "offline" && <p>🔴 Backend Offline</p>}
         </div>
 
-        {/* ERROR */}
         {error && (
           <div className="error-box-modern">
             <span>{error}</span>
-
-            <button onClick={() => setError("")}>
-              ✕
-            </button>
+            <button onClick={() => setError("")}>✕</button>
           </div>
         )}
 
-        {/* PRICING GRID */}
         <div className="pricing-grid">
           {plans.map((plan, index) => (
             <div
               key={index}
-              className={`pricing-card ${
-                plan.highlight ? "highlight" : ""
-              }`}
+              className={`pricing-card ${plan.highlight ? "highlight" : ""}`}
             >
               {plan.badge && (
-                <div className="popular-badge">
-                  {plan.badge}
-                </div>
+                <div className="popular-badge">{plan.badge}</div>
               )}
 
               <h3>{plan.title}</h3>
-
-              <p className="price">
-                ₱{plan.price}
-              </p>
+              <p className="price">₱{plan.price}</p>
 
               <ul>
                 {plan.desc.map((item, idx) => (
@@ -267,9 +219,7 @@ export default function Pricing() {
                   loadingPlan === plan.title ||
                   serverStatus !== "connected"
                 }
-                onClick={() =>
-                  handlePlanClick(plan.title, plan.price)
-                }
+                onClick={() => handlePlanClick(plan.title, plan.price)}
               >
                 {loadingPlan === plan.title
                   ? "Processing..."

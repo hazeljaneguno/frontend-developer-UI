@@ -1,6 +1,7 @@
 import express from "express";
 import axios from "axios";
 import dotenv from "dotenv";
+import cors from "cors";
 
 dotenv.config();
 
@@ -11,45 +12,29 @@ const PORT = process.env.PORT || 5000;
 const PAYMONGO_SECRET = process.env.PAYMONGO_SECRET_KEY;
 const FRONTEND_URL = process.env.FRONTEND_URL;
 
-/* ================= VALIDATION ================= */
-if (!PAYMONGO_SECRET) console.error("❌ Missing PAYMONGO_SECRET_KEY");
-if (!FRONTEND_URL) console.error("❌ Missing FRONTEND_URL");
+/* ================= ENV VALIDATION ================= */
+if (!PAYMONGO_SECRET) {
+  throw new Error("❌ Missing PAYMONGO_SECRET_KEY in .env");
+}
+
+if (!FRONTEND_URL) {
+  throw new Error("❌ Missing FRONTEND_URL in .env");
+}
 
 /* ================= MIDDLEWARE ================= */
 app.use(express.json());
 
-/* ================= CORS FIX (ROBUST) ================= */
-const allowedOrigins = [
-  FRONTEND_URL,
-  "http://localhost:5173",
-].filter(Boolean);
-
-app.use((req, res, next) => {
-  const origin = req.headers.origin;
-
-  // allow requests with no origin (Render, Postman, health checks)
-  if (!origin) {
-    res.setHeader("Access-Control-Allow-Origin", "*");
-  } 
-  // allow known origins
-  else if (allowedOrigins.includes(origin)) {
-    res.setHeader("Access-Control-Allow-Origin", origin);
-  }
-
-  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
-  res.setHeader("Vary", "Origin");
-
-  if (req.method === "OPTIONS") {
-    return res.sendStatus(204);
-  }
-
-  next();
-});
+/* ================= CORS ================= */
+app.use(
+  cors({
+    origin: [FRONTEND_URL, "http://localhost:5173"].filter(Boolean),
+    credentials: true,
+  })
+);
 
 /* ================= HEALTH CHECK ================= */
 app.get("/health", (req, res) => {
-  return res.status(200).json({
+  res.json({
     success: true,
     message: "Backend is running 🚀",
   });
@@ -60,6 +45,9 @@ app.post("/api/create-payment", async (req, res) => {
   try {
     const { plan, price, email } = req.body;
 
+    console.log("📩 Incoming payment request:", req.body);
+
+    /* VALIDATION */
     if (!plan || !price || !email) {
       return res.status(400).json({
         success: false,
@@ -67,8 +55,19 @@ app.post("/api/create-payment", async (req, res) => {
       });
     }
 
-    const amount = Math.round(Number(price) * 100);
+    const numericPrice = Number(price);
 
+    if (!Number.isFinite(numericPrice) || numericPrice <= 0) {
+      return res.status(400).json({
+        success: false,
+        error: "Invalid price value",
+      });
+    }
+
+    // Convert PHP → centavos
+    const amount = Math.round(numericPrice * 100);
+
+    /* PAYMONGO REQUEST */
     const response = await axios.post(
       "https://api.paymongo.com/v1/checkout_sessions",
       {
@@ -97,17 +96,19 @@ app.post("/api/create-payment", async (req, res) => {
             "Basic " +
             Buffer.from(`${PAYMONGO_SECRET}:`).toString("base64"),
           "Content-Type": "application/json",
+          Accept: "application/json",
         },
       }
     );
 
-    const checkoutUrl =
-      response.data?.data?.attributes?.checkout_url;
+    const checkoutUrl = response.data?.data?.attributes?.checkout_url;
+
+    console.log("🧾 PayMongo response:", response.data);
 
     if (!checkoutUrl) {
       return res.status(500).json({
         success: false,
-        error: "No checkout URL returned",
+        error: "Checkout URL not returned by PayMongo",
       });
     }
 
@@ -115,9 +116,8 @@ app.post("/api/create-payment", async (req, res) => {
       success: true,
       checkoutUrl,
     });
-
   } catch (err) {
-    console.error("PAYMONGO ERROR:", err.response?.data || err.message);
+    console.error("❌ PAYMONGO ERROR:", err.response?.data || err.message);
 
     return res.status(500).json({
       success: false,
@@ -130,5 +130,5 @@ app.post("/api/create-payment", async (req, res) => {
 
 /* ================= START SERVER ================= */
 app.listen(PORT, "0.0.0.0", () => {
-  console.log(`🚀 Server running on port ${PORT}`);
+  console.log(`🚀 Server running on http://localhost:${PORT}`);
 });

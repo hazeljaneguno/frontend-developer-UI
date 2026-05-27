@@ -5,37 +5,106 @@ export default function Contact() {
 
         {/* LEFT SIDE */}
         <div className="contact-info">
-          <h2>Let’s work together</h2>
+
+          <span className="contact-badge">
+            CONTACT
+          </span>
+
+          <h2>
+            Let’s Build Something Amazing Together
+          </h2>
+
           <p>
-            Send me a message and I’ll reply as soon as possible.
-            I’m open for freelance, frontend work, and collaborations.
+            I create modern React interfaces,
+            responsive web experiences, and scalable
+            frontend systems for startups,
+            businesses, and creative projects.
           </p>
 
+          {/* INFO CARDS */}
           <div className="info-box">
             <h4>Email</h4>
-            <p>gunohazeljane@gmail.com</p>
+
+            <a href="mailto:gunohazeljane@gmail.com">
+              gunohazeljane@gmail.com
+            </a>
           </div>
 
           <div className="info-box">
             <h4>Location</h4>
+
             <p>Philippines</p>
           </div>
 
           <div className="info-box">
-            <h4>Social</h4>
-            <p>GitHub / Facebook / Instagram</p>
+            <h4>Availability</h4>
+
+            <p>
+              Open for freelance,
+              frontend work, and collaborations
+            </p>
+          </div>
+
+          {/* SOCIALS */}
+          <div className="social-links">
+
+            <a
+              href="https://github.com/hazeljaneguno"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              GitHub
+            </a>
+
+            <a
+  href="https://facebook.com/hazeljaneguno"
+  target="_blank"
+  rel="noopener noreferrer"
+>
+  Facebook
+</a>
+            <a
+              href="https://instagram.com"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Instagram
+            </a>
+
           </div>
         </div>
 
-        {/* RIGHT SIDE FORM */}
+        {/* RIGHT SIDE */}
         <form className="contact-form">
-          <input type="text" placeholder="Your Name" />
-          <input type="email" placeholder="Your Email" />
-          <textarea placeholder="Your Message" rows="6"></textarea>
 
-          <button type="submit" className="primary-btn">
+          <div className="input-group">
+            <input
+              type="text"
+              placeholder="Your Name"
+            />
+          </div>
+
+          <div className="input-group">
+            <input
+              type="email"
+              placeholder="Your Email"
+            />
+          </div>
+
+          <div className="input-group">
+            <textarea
+              placeholder="Tell me about your project..."
+              rows="6"
+            />
+          </div>
+
+          <button
+            type="submit"
+            className="primary-btn"
+          >
             Send Message
           </button>
+
         </form>
 
       </div>

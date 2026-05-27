@@ -3,26 +3,30 @@ export default function handler(req, res) {
 
   const origin = req.headers.origin;
 
-  const allowedOrigins = [
+  const allowedOrigins = new Set([
     FRONTEND_URL,
     "http://localhost:5173",
-  ].filter(Boolean); // IMPORTANT FIX
+  ].filter(Boolean));
 
-  // ================= CORS =================
-  if (!origin || allowedOrigins.includes(origin)) {
-    res.setHeader("Access-Control-Allow-Origin", origin || "*");
+  /* ================= CORS ================= */
+
+  if (origin && allowedOrigins.has(origin)) {
+    res.setHeader("Access-Control-Allow-Origin", origin);
+  } else {
+    // fallback for safety (optional but stable)
+    res.setHeader("Access-Control-Allow-Origin", "*");
   }
 
   res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
   res.setHeader("Vary", "Origin");
 
-  // ================= PRE-FLIGHT =================
+  /* ================= PRE-FLIGHT ================= */
   if (req.method === "OPTIONS") {
-    return res.status(200).end();
+    return res.status(204).end();
   }
 
-  // ================= METHOD CHECK =================
+  /* ================= METHOD CHECK ================= */
   if (req.method !== "GET") {
     return res.status(405).json({
       success: false,
@@ -30,10 +34,10 @@ export default function handler(req, res) {
     });
   }
 
-  // ================= RESPONSE =================
+  /* ================= RESPONSE ================= */
   return res.status(200).json({
     success: true,
     message: "Backend connected 🚀",
-    timestamp: new Date().toISOString(),
+    timestamp: Date.now(),
   });
 }

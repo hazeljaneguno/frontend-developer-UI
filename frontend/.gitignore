@@ -1,24 +1,25 @@
-# env files
+# ================= ENV FILES =================
 .env
 .env.*
-backend/.env
-frontend/.env
 
-# dependencies
+# ================= DEPENDENCIES =================
 node_modules
 
-# builds
+# ================= BUILDS =================
 dist
 dist-ssr
 build
 
-# logs
+# ================= LOGS =================
 *.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 
-# editor
+# ================= EDITOR =================
 .vscode
 .idea
-.DS_Store
 
-# git
-.git
+# ================= SYSTEM =================
+.DS_Store
+Thumbs.db
